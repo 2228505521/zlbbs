@@ -1,0 +1,10 @@
+
+.captcha_addon {
+    padding: 0;
+    overflow: hidden;
+}
+
+.captcha_img {
+    height: 32px;
+    cursor: pointer;
+}
