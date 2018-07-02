@@ -12,3 +12,5 @@ def my_before_request():
         user = FrontUser.query.get(user_id)
         if user:
             g.front_user = user
+    else:
+        g.front_user = None

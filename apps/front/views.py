@@ -121,6 +121,7 @@ class PostView(views.MethodView):
 
 bp.add_url_rule('/post/', view_func=PostView.as_view('post'), endpoint='post')
 
+
 @bp.route('/phoneCaptcha/')
 def phone_captcha():
     resp = json.loads(sms_alidayu.send_sms("18600764994", "程佳俊", "SMS_137550462", r"{code:1234}"))

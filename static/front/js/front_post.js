@@ -12,7 +12,7 @@ $(function () {
 
         var content = ue.getContent();
 
-        if (!title || !board_id || !content){
+        if (!title || !board_id || !content) {
             xtalert.alertInfoToast('请完善相关信息！');
             return;
         }
@@ -32,8 +32,9 @@ $(function () {
                         'cancelText': '返回首页',
                         'confirmCallback': function () {
                             titleInput.val('');
-                            ue.clean();
-                            selectB.selectByIndex(0);
+                            ue.execCommand('cleardoc');
+                            selectB.prop("selectedIndex", 0);
+                            xtalert.close();
                         },
                         'cancelCallback': function () {
                             window.location = '/front/index/'

@@ -35,5 +35,5 @@ class LoginForm(BaseForm):
 class PostForm(BaseForm):
     title = StringField(validators=[InputRequired(message='请输入标题！')])
     content = StringField(validators=[InputRequired(message='请输入内容！')])
-    board_id = IntegerField(validators=[IntegerField(message='请输入版块id！')])
+    board_id = IntegerField(validators=[InputRequired(message='请输入版块id！')])
 

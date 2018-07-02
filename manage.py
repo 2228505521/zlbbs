@@ -8,7 +8,7 @@ from apps.cms import models as cms_models
 
 from apps.front import models as front_models
 
-from apps.models import BannerModel, BoardModel
+from apps.models import BannerModel, BoardModel, PostModel
 
 app = create_app()
 
