@@ -7,7 +7,8 @@ from flask import (
     make_response,
     request,
     session,
-    g
+    g,
+    abort
 )
 
 from static.common.sms_alidayu import sms_alidayu
@@ -139,6 +140,15 @@ class PostView(views.MethodView):
             return restful.params_error(form.get_error())
 
 bp.add_url_rule('/post/', view_func=PostView.as_view('post'), endpoint='post')
+
+
+# 帖子详情
+@bp.route('/pd/<post_id>/')
+def post_detail(post_id):
+    post = PostModel.query.filter_by(id=post_id).first()
+    if not post:
+        abort(404)
+    return render_template('front/front_pdetail.html', post=post)
 
 
 @bp.route('/phoneCaptcha/')

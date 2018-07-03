@@ -63,7 +63,7 @@
                             <img src="{{ post.author.avatar or url_for('static', filename='common/imgs/avatar.png') }}">
                         </div>
                         <div class="post-info-group">
-                            <a href="{{ post.content }}"><p class="post-title">{{ post.title }}</p></a>
+                            <a href="{{ url_for('front.post_detail', post_id=post.id) }}"><p class="post-title">{{ post.title }}</p></a>
                             <p class="post-info">
                                 <span>作者：{{ post.author.username }}</span>
                                 <span>评论：0</span>
@@ -93,10 +93,10 @@
                 {% if current|int == board.id %}
                     <a href="{{ url_for('front.index', bd=board.id) }}"
                        class="list-group-item active">{{ board.name }}<span
-                            class="badge">10</span></a>
+                            class="badge">{{ board.posts|length or 0 }}</span></a>
                 {% else %}
                     <a href="{{ url_for('front.index', bd=board.id) }}" class="list-group-item">{{ board.name }}<span
-                            class="badge">10</span></a>
+                            class="badge">{{ board.posts|length or 0 }}</span></a>
                 {% endif %}
             {% endfor %}
         </div>
