@@ -37,3 +37,7 @@ class PostForm(BaseForm):
     content = StringField(validators=[InputRequired(message='请输入内容！')])
     board_id = IntegerField(validators=[InputRequired(message='请输入版块id！')])
 
+
+class CommentForm(BaseForm):
+    content = StringField(validators=[InputRequired(message='请输入评论内容')])
+    post_id = IntegerField(validators=[InputRequired(message='没有找到帖子id')])

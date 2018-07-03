@@ -1,10 +1,10 @@
-.post-container{
+.post-container {
     border: 1px solid #e6e6e6;
     padding: 10px;
     border-radius: 10px;
 }
 
-.post-info-group{
+.post-info-group {
     font-size: 12px;
     color: #8c8c8c;
     border-bottom: 1px solid #e6e6e6;
@@ -12,15 +12,97 @@
     padding-bottom: 10px;
 }
 
-.post-info-group span{
+.post-info-group span {
     margin-right: 20px;
     color: #cccccc;
 }
 
-.post-content{
+.post-content {
     margin-top: 30px;
 }
 
-.post-content img{
+.post-content img {
     max-width: 100%;
+}
+
+.comment-list-group {
+    margin-top: 10px;
+    margin-left: 20px;
+    overflow: hidden;
+}
+
+.comment-acatar {
+    float: left;
+}
+
+.comment-acatar img {
+    width: 50px;
+    height: 52px;
+}
+
+.comment-info {
+    float: left;
+    margin-left: 20px;
+    width: 80%;
+}
+
+.comment-info .comment-content1 {
+}
+
+.comment-info .comment-content2 {
+    margin-top: 10px;
+}
+
+.comment-group {
+    margin-top: 10px;
+    border: 1px solid #e8e8e8;
+    padding: 10px;
+}
+
+.comment-group ul {
+    list-style: none;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.comment-group h3 {
+    font-size: 15px;
+    color: #00a0e9;
+}
+
+#editor {
+    margin-top: 10px;
+}
+
+.add-comment-group {
+    margin-top: 20px;
+    border: 1px solid #e8e8e8;
+    padding: 10px;
+    margin-bottom: 100px;
+}
+
+.add-comment-group h3 {
+    font-size: 15px;
+    color: #00a0e9;
+}
+
+.add-comment-group #submit-btn {
+    margin-top: 20px;
+}
+
+.submit-btn-group {
+    text-align: right;
+}
+
+
+.my-container{
+    text-align: center;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+}
+
+.my-container img{
+    width: 80px;
+    height: 82px;
+    margin-top: 10px;
 }

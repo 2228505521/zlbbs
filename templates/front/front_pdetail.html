@@ -6,6 +6,9 @@
 {% endblock %}
 
 {% block head %}
+    <script src="{{ static('ueditor/ueditor.config.js') }}"></script>
+    <script src="{{ static('ueditor/ueditor.all.min.js') }}"></script>
+    <script src="{{ static('front/js/front_comment.js') }}"></script>
     <link rel="stylesheet" href="{{ static('front/css/front_pdetail.css') }}">
 {% endblock %}
 
@@ -20,10 +23,47 @@
                 <span>阅读数：{{ post.read_count }}</span>
                 <span>评论数：0</span>
             </p>
-            <article class="post-content">
+            <article class="post-content" id="post-content" data-id="{{ post.id }}">
                 {{ post.content|safe }}
             </article>
         </div>
+        <div class="comment-group">
+            <h3>评论列表</h3>
+            {% for comment in post.comments %}
+                <ul class="comment-list-group">
+                    <li>
+                        <div class="comment-acatar">
+                            <img src="{{ comment.author.avatar or static('common/imgs/avatar.png') }}">
+                        </div>
+                        <div class="comment-info">
+                            <p class="comment-content1">
+                                <span style="font-size: 15px;color: black">{{ comment.author.username }}</span>
+                                <span style="font-size: 13px;color: #cccccc;margin-left: 20px">{{ comment.create_time }}</span>
+                            </p>
+                            <p class="comment-content2">
+                                <span>{{ comment.content|safe }}</span>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            {% endfor %}
+        </div>
+        <div class="add-comment-group">
+            <h3>发表评论</h3>
+            <script id="editor" type="text/plain"></script>
+            <div class="submit-btn-group">
+                <button class="btn btn-primary" id="submit-btn">立即提交</button>
+            </div>
+        </div>
     </div>
-    <div class="sm-container"></div>
+    <div class="sm-container">
+        <div class="my-container">
+            <div class="my-avatar">
+                <img src="{{ post.author.avatar or static('common/imgs/avatar.png') }}">
+            </div>
+            <h3 style="margin-bottom: 5px">{{ post.author.username }}</h3>
+            <p style="margin-bottom: 5px"><span>0积分</span></p>
+            <button class="btn btn-warning" style="margin-bottom: 10px">Ta的主页</button>
+        </div>
+    </div>
 {% endblock %}

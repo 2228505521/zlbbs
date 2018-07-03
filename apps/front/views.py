@@ -13,10 +13,10 @@ from flask import (
 
 from static.common.sms_alidayu import sms_alidayu
 import json
-from .forms import SignUpForm, LoginForm, PostForm
+from .forms import SignUpForm, LoginForm, PostForm, CommentForm
 from utils import restful
 from .models import FrontUser
-from ..models import BannerModel, BoardModel, PostModel
+from ..models import BannerModel, BoardModel, PostModel, CommentModel
 from exts import db
 from utils import safeutils
 import config
@@ -149,6 +149,25 @@ def post_detail(post_id):
     if not post:
         abort(404)
     return render_template('front/front_pdetail.html', post=post)
+
+
+# 评论
+@bp.route('/addcomment/', methods=['POST'])
+@login_required
+def add_comment():
+    form = CommentForm(request.form)
+    if form.validate():
+        content = form.content.data
+        post_id = form.post_id.data
+        post = PostModel.query.get(post_id)
+        if not post:
+            return restful.params_error('没有找到对应的帖子')
+        comment = CommentModel(content=content, post_id=post_id, author_id=g.front_user.id)
+        db.session.add(comment)
+        db.session.commit()
+        return restful.success('评论成功！')
+    else:
+        return restful.params_error(form.get_error())
 
 
 @bp.route('/phoneCaptcha/')

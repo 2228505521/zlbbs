@@ -39,7 +39,7 @@ ALIDAYU_SIGN_NAME = '小饭桌应用'#程佳俊
 ALIDAYU_TEMPLATE_CODE = 'SMS_68465012'#SMS_137550462
 
 # ueditor相关配置
-UEDITOR_UPLOAD_PATH = os.path.join(os.path.dirname(__file__), 'images')
+# UEDITOR_UPLOAD_PATH = os.path.join(os.path.dirname(__file__), 'images')
 UEDITOR_UPLOAD_TO_QINIU = True
 UEDITOR_QINIU_ACCESS_KEY = "a3KafHAOJy_WPOuoV8dqTT4VvMWuhq9QNAFzD7tx"
 UEDITOR_QINIU_SECRET_KEY = "W8lA713_lha9rt9mX4its0WWAPTWJWC4LiDcY8Yg"

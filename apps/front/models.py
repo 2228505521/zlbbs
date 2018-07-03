@@ -26,6 +26,7 @@ class FrontUser(db.Model):
     signature = db.Column(db.String(100))
     gender = db.Column(db.Enum('male', 'female', 'secret', 'unknow'), default='unknow')
     join_time = db.Column(db.DateTime, default=datetime.datetime.now)
+    integral = db.Column(db.String(50))
 
     def __init__(self, *args, **kwargs):
         if "password" in kwargs:
