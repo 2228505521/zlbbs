@@ -7,6 +7,7 @@ from flask import (
     make_response,
     request,
     session,
+    g
 )
 
 from static.common.sms_alidayu import sms_alidayu
@@ -19,16 +20,34 @@ from exts import db
 from utils import safeutils
 import config
 from .decorators import login_required
+from flask_paginate import Pagination, get_page_parameter
 
 bp = Blueprint('front', __name__, url_prefix='/front')
 
 @bp.route('/index/')
 def index():
+    board_id = request.args.get('bd')
     banners = BannerModel.query.order_by(BannerModel.prioirty.desc()).limit(4)
     boards = BoardModel.query.all()
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    start = (page - 1)*10
+    end = start + 10
+    posts = None
+    total = 0
+    if board_id:
+        query_obj = PostModel.query.filter_by(board_id=board_id)
+        posts = query_obj.slice(start, end)
+        total = query_obj.count()
+    else:
+        posts = PostModel.query.slice(start, end)
+        total = PostModel.query.count()
+    pagination = Pagination(bs_version=3, page=page, total=total)
     context = {
         'banners': banners,
-        'boards': boards
+        'boards': boards,
+        'posts': posts,
+        'pagination': pagination,
+        'current': board_id
     }
     return render_template('front/front_index.html', **context)
 
@@ -112,7 +131,7 @@ class PostView(views.MethodView):
             board = BoardModel.query.get(form.board_id.data)
             if not board:
                 return restful.params_error('没有找到这个版块')
-            post = PostModel(title=form.title.data, content=form.content.data, board_id=form.board_id.data)
+            post = PostModel(title=form.title.data, content=form.content.data, board_id=form.board_id.data, author=g.front_user)
             db.session.add(post)
             db.session.commit()
             return restful.success('帖子发布成功！')

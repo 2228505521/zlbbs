@@ -33,8 +33,6 @@ class FrontUser(db.Model):
             kwargs.pop("password")
         super(FrontUser, self).__init__(*args, **kwargs)
 
-
-
     @property
     def password(self):
         return self._password

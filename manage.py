@@ -88,6 +88,18 @@ def create_front_user(telephone, username, password):
     db.session.add(user)
     db.session.commit()
 
+# 创建帖子列表测试数据
+@manager.command
+def create_test_post():
+    for x in range(1, 205):
+        title = '标题%s' % x
+        content = '内容：%s' % x
+        board = BoardModel.query.first()
+        author = FrontUser.query.first()
+        post = PostModel(title=title, content=content, board=board, author=author)
+        db.session.add(post)
+        db.session.commit()
+        print('恭喜，测试帖子添加完成')
 
 
 if __name__ == '__main__':
