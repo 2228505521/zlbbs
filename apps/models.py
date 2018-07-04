@@ -46,3 +46,12 @@ class CommentModel(db.Model):
     post = db.relationship('PostModel', backref='comments')
 
     author = db.relationship('FrontUser', backref='comments')
+
+
+class HeighLightPostModel(db.Model):
+    __tablename__ = 'heighlight_post'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    create_time = db.Column(db.DateTime, default=datetime.now)
+
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    post = db.relationship('PostModel', backref='heighlist')

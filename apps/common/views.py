@@ -10,6 +10,9 @@ from utils.captcha import Captcha
 from io import BytesIO
 import qiniu
 
+# celery异步发送短息
+from tasks import send_captcha
+
 bp = Blueprint('common', __name__, url_prefix='/com')
 
 # 图形验证码
@@ -49,7 +52,10 @@ def smsCaptcha():
     if form.validate():
         telephone = form.telephone.data
         captcha = Captcha.gene_text(4)
-        resp = json.loads(sms_alidayu.send_sms(telephone, template_param=u"{'code':'%s'}" % captcha))
+        # sms_alidayu.send_sms(telephone, template_param=u"{'code':'%s'}" % captcha)
+        # send_captcha(telephone, template_param=u"{'code':'%s'}" % captcha)
+        resp = json.loads(send_captcha(telephone, template_param=u"{'code':'%s'}" % captcha))
+        print(resp)
         if resp.get('Code') == 'OK':
             # 保存验证码到内存中
             cache.set(telephone, captcha.lower())

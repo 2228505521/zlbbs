@@ -11,7 +11,7 @@ from flask import (
 )
 
 from .models import CMSUser, CMSPersmission
-from ..models import BannerModel, BoardModel
+from ..models import BannerModel, BoardModel, PostModel, HeighLightPostModel
 from .forms import (
     LoginForm,
     RestPWDForm,
@@ -30,6 +30,10 @@ from flask_mail import Message
 import string
 import random
 from utils.zlcache import cache
+from flask_paginate import get_page_parameter, Pagination
+
+# celery异步执行发送邮件
+from tasks import send_mail
 
 bp = Blueprint('cms', __name__, url_prefix='/cms')
 
@@ -156,9 +160,14 @@ def email_captcha():
     captcha = ''.join(random.sample(source, 6))
 
     # 发送邮件
-    message = Message(subject='您的验证码是：', recipients=[email], body=captcha)
+    # message = Message(subject='您的验证码是：', recipients=[email], body=captcha)
+    # try:
+    #     mail.send(message)
+    # except:
+    #     return restful.server_error('服务器内部错误')
+
     try:
-        mail.send(message)
+        send_mail(subject='您的验证码是：', recipients=[email], body=captcha)
     except:
         return restful.server_error('服务器内部错误')
 
@@ -255,7 +264,75 @@ def def_banner():
 @login_required
 @permission_required(CMSPersmission.POSTER)
 def posts():
-    return render_template('cms/cms_posts.html')
+    star = request.args.get('star', type=int, default=0)
+    puery_obj = None
+
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    start = (page - 1) * 10
+    end = start + 10
+    total = PostModel.query.count()
+    pagination = Pagination(page=page, bs_version=3, total=total)
+
+    if star == 1:
+        puery_obj = db.session.query(PostModel).outerjoin(HeighLightPostModel).filter(PostModel.id==HeighLightPostModel.post_id).order_by(HeighLightPostModel.create_time.desc(), PostModel.create_time.desc()).slice(start, end)
+    elif star == 2:
+        # puery_obj = db.session.query(PostModel).outerjoin(HeighLightPostModel).filter(PostModel.id!=HeighLightPostModel.post_id).order_by(PostModel.create_time.desc()).slice(start, end)
+
+        puery_obj = db.session.query(PostModel).filter(PostModel.heighlist == None).order_by(PostModel.create_time.desc()).slice(start, end)
+    else:
+        puery_obj = PostModel.query.order_by(PostModel.create_time.desc()).slice(start, end)
+
+    return render_template('cms/cms_posts.html', posts=puery_obj, pagination=pagination)
+
+
+# 帖子加精
+@bp.route('/hpost/', methods=['POST'])
+@permission_required(CMSPersmission.POSTER)
+def heighlist_post():
+    post_id = request.form.get('post_id')
+    if not post_id:
+        return restful.params_error('没有帖子id')
+    post = PostModel.query.get(post_id)
+    if not post:
+        return restful.params_error('没有找到对应帖子')
+    heighlight = HeighLightPostModel(post=post)
+    db.session.add(heighlight)
+    db.session.commit()
+    return restful.success('已成功加精！')
+
+
+# 取消加精
+@bp.route('/uhpost/', methods=['POST'])
+@permission_required(CMSPersmission.POSTER)
+def unheighlist_post():
+    post_id = request.form.get('post_id')
+    if not post_id:
+        return restful.params_error('没有帖子id')
+    post = PostModel.query.get(post_id)
+    if not post:
+        return restful.params_error('没有找到对应帖子')
+    heighl = HeighLightPostModel.query.filter_by(post_id=5).first()
+    db.session.delete(heighl)
+    db.session.commit()
+    return restful.success('已取消加精！')
+
+
+# 删除帖子
+@bp.route('/dhpost/', methods=['POST'])
+@permission_required(CMSPersmission.POSTER)
+def delheighlist_post():
+    post_id = request.form.get('post_id')
+    if not post_id:
+        return restful.params_error('没有帖子id')
+    post = PostModel.query.get(post_id)
+    if not post:
+        return restful.params_error('没有找到对应帖子')
+    heighlist = post.heighlist
+    if heighlist:
+        db.session.delete(heighlist)
+    db.session.delete(post)
+    db.session.commit()
+    return restful.success('帖子已删除！')
 
 
 # 评论管理

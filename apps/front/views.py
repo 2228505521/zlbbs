@@ -10,18 +10,22 @@ from flask import (
     g,
     abort
 )
+from sqlalchemy.sql import func
 
 from static.common.sms_alidayu import sms_alidayu
 import json
 from .forms import SignUpForm, LoginForm, PostForm, CommentForm
 from utils import restful
 from .models import FrontUser
-from ..models import BannerModel, BoardModel, PostModel, CommentModel
+from ..models import BannerModel, BoardModel, PostModel, CommentModel, HeighLightPostModel
 from exts import db
 from utils import safeutils
 import config
 from .decorators import login_required
 from flask_paginate import Pagination, get_page_parameter
+
+# celery异步发送短信
+from tasks import send_captcha
 
 bp = Blueprint('front', __name__, url_prefix='/front')
 
@@ -31,24 +35,36 @@ def index():
     banners = BannerModel.query.order_by(BannerModel.prioirty.desc()).limit(4)
     boards = BoardModel.query.all()
     page = request.args.get(get_page_parameter(), type=int, default=1)
+    sort = request.args.get('st', type=int, default=1)
     start = (page - 1)*10
     end = start + 10
     posts = None
     total = 0
+    global query_obj
+    if sort == 1:
+        query_obj = PostModel.query.order_by(PostModel.create_time.desc())
+    elif sort == 2:
+        query_obj = db.session.query(PostModel).outerjoin(HeighLightPostModel).order_by(HeighLightPostModel.create_time.desc(), PostModel.create_time.desc())
+    elif sort == 3:
+        pass
+    elif sort == 4:
+        query_obj = db.session.query(PostModel).outerjoin(CommentModel).group_by(PostModel.id).order_by(func.count(CommentModel.id).desc(), PostModel.create_time.desc())
+
     if board_id:
-        query_obj = PostModel.query.filter_by(board_id=board_id)
+        query_obj = PostModel.query.filter(PostModel.board_id==board_id)
         posts = query_obj.slice(start, end)
         total = query_obj.count()
     else:
-        posts = PostModel.query.slice(start, end)
-        total = PostModel.query.count()
+        posts = query_obj.slice(start, end)
+        total = query_obj.count()
     pagination = Pagination(bs_version=3, page=page, total=total)
     context = {
         'banners': banners,
         'boards': boards,
         'posts': posts,
         'pagination': pagination,
-        'current': board_id
+        'current': board_id,
+        'current_sort': sort
     }
     return render_template('front/front_index.html', **context)
 
@@ -172,7 +188,8 @@ def add_comment():
 
 @bp.route('/phoneCaptcha/')
 def phone_captcha():
-    resp = json.loads(sms_alidayu.send_sms("18600764994", "程佳俊", "SMS_137550462", r"{code:1234}"))
+    # sms_alidayu.send_sms("18600764994", "程佳俊", "SMS_137550462", r"{code:1234}")
+    resp = json.loads(send_captcha("18600764994", template_param=r"{code:1234}"))
     if resp['Code'] == 'OK':
         return ('发送成功')
     else:
